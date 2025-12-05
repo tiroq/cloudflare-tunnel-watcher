@@ -16,6 +16,7 @@ class Config:
     
     telegram_token: str
     chat_id: str
+    ssh_username: str = "username"
     cloudflared_path: str = "cloudflared"
     ssh_port: int = 22
     log_level: str = "INFO"
@@ -122,6 +123,7 @@ def load_config() -> Config:
     config = Config(
         telegram_token=telegram_token,
         chat_id=chat_id,
+        ssh_username=os.getenv("SSH_USERNAME", "username"),
         cloudflared_path=os.getenv("CLOUDFLARED_PATH", "cloudflared"),
         ssh_port=int(os.getenv("SSH_PORT", "22")),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
