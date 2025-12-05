@@ -1,0 +1,30 @@
+[Unit]
+Description=Cloudflare Tunnel Auto-Watcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/cloudflare-watcher
+ExecStart=/usr/bin/python3 /opt/cloudflare-watcher/watcher.py
+EnvironmentFile=/opt/cloudflare-watcher/.env
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening (optional, test before enabling)
+# NoNewPrivileges=true
+# PrivateTmp=true
+# ProtectSystem=strict
+# ProtectHome=true
+# ReadWritePaths=/opt/cloudflare-watcher
+
+# Resource limits
+MemoryMax=500M
+CPUQuota=50%
+TasksMax=10
+
+[Install]
+WantedBy=multi-user.target
