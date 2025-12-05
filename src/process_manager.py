@@ -180,12 +180,12 @@ class ProcessManager:
     
     def read_stdout_line(self) -> Optional[str]:
         """
-        Read a line from stdout (non-blocking).
+        Read a line from stderr (cloudflared outputs to stderr).
         
         Returns:
             A line of output, or None if no data available or process dead
         """
-        if self.process is None or self.process.stdout is None:
+        if self.process is None or self.process.stderr is None:
             return None
         
         try:
@@ -193,8 +193,8 @@ class ProcessManager:
             if not self.is_alive():
                 return None
             
-            # Read line (this will block until a line is available)
-            line = self.process.stdout.readline()
+            # Read line from stderr (cloudflared outputs tunnel info here)
+            line = self.process.stderr.readline()
             
             if line:
                 return line.strip()
@@ -202,7 +202,7 @@ class ProcessManager:
             return None
             
         except Exception as e:
-            logger.error(f"[ProcessManager] Error reading stdout: {e}")
+            logger.error(f"[ProcessManager] Error reading stderr: {e}")
             return None
     
     def get_exit_code(self) -> Optional[int]:
