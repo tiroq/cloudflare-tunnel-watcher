@@ -37,6 +37,12 @@ sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
 sudo chmod +x /usr/local/bin/cloudflared
 ```
 
+#### MacOS
+
+```bash
+brew install cloudflare/cloudflare/cloudflared
+```
+
 ### 2. Create Telegram Bot
 
 1. Open Telegram and search for [@BotFather](https://t.me/botfather)
@@ -73,6 +79,7 @@ pip install -r requirements.txt
 cat > /opt/cloudflare-watcher/.env << 'EOF'
 TELEGRAM_TOKEN=your_bot_token_here
 CHAT_ID=your_chat_id_here
+SSH_USERNAME=username
 EOF
 
 # Secure the file
@@ -126,6 +133,9 @@ CHAT_ID=-1001234567890
 ### Optional Variables
 
 ```bash
+# SSH username for tunnel connections (default: username)
+SSH_USERNAME=username
+
 # Path to cloudflared binary (default: uses PATH)
 CLOUDFLARED_PATH=/usr/local/bin/cloudflared
 
@@ -257,6 +267,7 @@ cloudflare-watcher/
 ├── cloudflare-watcher.service    # systemd unit file
 ├── requirements.txt              # Python dependencies
 ├── .env                          # Configuration (not in git)
+├── .env.example                  # Example configuration file
 └── README.md                     # This file
 ```
 
