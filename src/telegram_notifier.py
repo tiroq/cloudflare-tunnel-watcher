@@ -18,16 +18,18 @@ class TelegramNotifier:
     RETRY_DELAYS = [2, 4, 8]  # Exponential backoff in seconds
     REQUEST_TIMEOUT = 10  # seconds
     
-    def __init__(self, token: str, chat_id: str):
+    def __init__(self, token: str, chat_id: str, ssh_username: str = "username"):
         """
         Initialize the Telegram notifier.
         
         Args:
             token: Telegram bot token
             chat_id: Telegram chat ID to send messages to (format: chat_id or chat_id_topic_id)
+            ssh_username: SSH username for the connection command (default: username)
         """
         self.token = token
         self.chat_id = chat_id
+        self.ssh_username = ssh_username
         self.base_chat_id, self.message_thread_id = self._parse_chat_id(chat_id)
         self._validate_config()
     
@@ -71,11 +73,20 @@ class TelegramNotifier:
             Formatted message text
         """
         timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+        
+        # Extract hostname from URL (e.g., "potatoes-left-powell-taken.trycloudflare.com")
+        hostname = url.replace("https://", "").replace("http://", "")
+        
+        # Build SSH command
+        ssh_command = f'ssh -o ProxyCommand="cloudflared access ssh --hostname {hostname}" {self.ssh_username}@localhost'
+        
         return (
             "🔗 New Cloudflare SSH Tunnel\n\n"
             f"URL: {url}\n\n"
             f"Status: Active\n"
-            f"Time: {timestamp}"
+            f"Time: {timestamp}\n\n"
+            f"💻 Connect:\n"
+            f"`{ssh_command}`"
         )
     
     def send_notification(self, url: str) -> bool:
