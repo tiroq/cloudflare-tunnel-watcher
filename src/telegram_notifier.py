@@ -89,12 +89,13 @@ class TelegramNotifier:
             True if notification was sent successfully, False otherwise
         """
         message = self._format_message(url)
+        logger.info(f"[Telegram] Preparing to send notification for URL: {url}")
         
         for attempt in range(self.MAX_RETRIES):
             try:
                 success = self._send_message(message)
                 if success:
-                    logger.info(f"[Telegram] Notification sent successfully")
+                    logger.info(f"[Telegram] ✓ Notification sent successfully for: {url}")
                     return True
                 
                 # If we got a client error (4xx), don't retry
@@ -134,22 +135,26 @@ class TelegramNotifier:
         if self.message_thread_id is not None:
             payload["message_thread_id"] = self.message_thread_id
         
+        logger.debug(f"[Telegram] Sending to chat_id: {self.base_chat_id}" +
+                     (f", thread_id: {self.message_thread_id}" if self.message_thread_id else ""))
+        
         response = requests.post(url, json=payload, timeout=self.REQUEST_TIMEOUT)
         
         if response.status_code == 200:
+            logger.info(f"[Telegram] Message delivered (HTTP 200)")
             return True
         
         # Handle different error codes
         if response.status_code in [401, 403, 404]:
-            logger.error(f"[Telegram] Authentication/authorization error: {response.status_code}")
+            logger.error(f"[Telegram] ✗ Authentication/authorization error: {response.status_code}")
             return False
         
         # Server errors (5xx) should be retried
         if response.status_code >= 500:
-            logger.warning(f"[Telegram] Server error: {response.status_code}")
+            logger.warning(f"[Telegram] ✗ Server error: {response.status_code}")
             raise requests.RequestException(f"Server error: {response.status_code}")
         
-        logger.error(f"[Telegram] Unexpected error: {response.status_code}")
+        logger.error(f"[Telegram] ✗ Unexpected error: {response.status_code}")
         return False
     
     def test_connection(self) -> bool:

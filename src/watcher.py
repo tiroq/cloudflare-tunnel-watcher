@@ -162,7 +162,8 @@ class CloudflareWatcher:
                 
                 # Check if this is a new URL
                 if self.parser.is_new_url(url):
-                    logger.info(f"[Parser] New URL detected: {url}")
+                    logger.info(f"[Parser] ✓ New URL detected: {url}")
+                    logger.info(f"[Watcher] Tunnel URL: {url}")
                     self.state = WatcherState.MONITORING
                     
                     # Send notification
@@ -181,9 +182,11 @@ class CloudflareWatcher:
         success = self.telegram.send_notification(url)
         
         if success:
-            logger.info("[Watcher] Notification sent successfully")
+            logger.info("[Watcher] ✓ Message sent successfully to Telegram")
+            logger.info(f"[Watcher] Notification delivered for: {url}")
         else:
-            logger.warning("[Watcher] Failed to send notification, but continuing to monitor")
+            logger.error("[Watcher] ✗ Failed to send message to Telegram")
+            logger.warning("[Watcher] Notification failed, but continuing to monitor")
         
         self.state = WatcherState.MONITORING
     

@@ -1,7 +1,11 @@
 """Parser module for extracting Cloudflare tunnel URLs from stdout."""
 
+import logging
 import re
 from typing import Optional
+
+
+logger = logging.getLogger(__name__)
 
 
 class URLParser:
@@ -28,7 +32,11 @@ class URLParser:
             return None
             
         match = self.URL_PATTERN.search(line)
-        return match.group(0) if match else None
+        if match:
+            url = match.group(0)
+            logger.debug(f"[Parser] URL found in line: {url}")
+            return url
+        return None
     
     def is_new_url(self, url: str) -> bool:
         """
@@ -42,7 +50,10 @@ class URLParser:
         """
         if url != self.current_url:
             self.current_url = url
+            logger.info(f"[Parser] New unique URL: {url}")
             return True
+        else:
+            logger.debug(f"[Parser] URL already seen: {url}")
         return False
     
     def reset(self):
