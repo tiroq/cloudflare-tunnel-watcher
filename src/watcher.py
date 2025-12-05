@@ -52,7 +52,8 @@ class CloudflareWatcher:
         )
         self.telegram = TelegramNotifier(
             token=config.telegram_token,
-            chat_id=config.chat_id
+            chat_id=config.chat_id,
+            ssh_username=config.ssh_username
         )
         
         # Set up signal handlers
